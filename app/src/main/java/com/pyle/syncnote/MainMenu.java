@@ -10,4 +10,4 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
     }
-    /* This is my comment.*/}
+    /* This is my comment.2*/}
