@@ -11,3 +11,4 @@ public class MainMenu extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
     }
     /* Seth*/}
+ // test commit
