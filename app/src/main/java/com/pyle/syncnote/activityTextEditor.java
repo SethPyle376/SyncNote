@@ -1,0 +1,13 @@
+package com.pyle.syncnote;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+
+public class activityTextEditor extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_text_editor);
+    }
+}

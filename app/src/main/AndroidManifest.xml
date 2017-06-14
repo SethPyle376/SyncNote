@@ -18,7 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity_text_editor"></activity>
+        <activity android:name=".activityTextEditor"></activity>
     </application>
 
 </manifest>
