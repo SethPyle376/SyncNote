@@ -1,8 +1,10 @@
 package com.pyle.syncnote;
 
 import android.os.Handler;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 
 import java.io.IOException;
 
@@ -18,13 +20,6 @@ public class MainMenu extends AppCompatActivity {
         final Client socket = new Client("52.10.127.103", 8080);
         socket.setClientCallback(callback);
         socket.connect();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                socket.disconnect();
-            }
-        }, 10000);
-
 
     }
     /* Seth*/}
