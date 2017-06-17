@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SyncNote</string>
+    <string name="action_menu">action_menu</string>
 </resources>
