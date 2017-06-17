@@ -20,6 +20,8 @@ public class MainMenu extends AppCompatActivity {
     private DrawerLayout drawer;
     private ListView drawerList;
     private ArrayAdapter<String> adapter;
+    private NetworkCallback callback;
+    Client socket;
 
 
 
@@ -30,7 +32,7 @@ public class MainMenu extends AppCompatActivity {
         //Set view to text editting
         setContentView(R.layout.activity_text_editor);
         String[] drawerItems = { "Editor", "Notes"};
-        
+
         //Grab drawer for later
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
@@ -45,8 +47,8 @@ public class MainMenu extends AppCompatActivity {
 
 
         //Setup connection to server, send test message
-        NetworkCallback callback = new NetworkCallback();
-        final Client socket = new Client("52.10.127.103", 3000);
+        callback = new NetworkCallback(this);
+        socket = new Client("52.10.127.103", 3000);
         socket.setClientCallback(callback);
         socket.connect();
 
@@ -63,6 +65,11 @@ public class MainMenu extends AppCompatActivity {
         switch (item.getItemId()) {
             //When user presses menu at top left, this will open or close drawer
             case android.R.id.home:
+                try {
+                    socket.send("opened\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 if (drawer.isDrawerOpen(Gravity.LEFT)) {
                 drawer.closeDrawer(Gravity.LEFT);
                 }

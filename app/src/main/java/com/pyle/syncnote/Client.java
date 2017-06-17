@@ -35,8 +35,7 @@ public class Client {
                     socket.connect(socketAddress);
                     socketOutput = socket.getOutputStream();
                     socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    send("Test message\n");
-
+                    send("test");
                     new ReceiveThread().start();
 
                     if(listener!=null)
