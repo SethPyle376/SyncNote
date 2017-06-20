@@ -1,11 +1,19 @@
 package com.pyle.syncnote;
 
+import android.app.Activity;
+
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
 
 /**
  * Created by Jason on 6/12/2017.
@@ -19,10 +27,12 @@ public class Client {
     private String ip;
     private int port;
     private ClientCallback listener=null;
+    private Activity activity;
 
-    public Client(String ip, int port){
+    public Client(String ip, int port, Activity activity){
         this.ip=ip;
         this.port=port;
+        this.activity = activity;
     }
 
     public void connect(){
@@ -35,7 +45,7 @@ public class Client {
                     socket.connect(socketAddress);
                     socketOutput = socket.getOutputStream();
                     socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    send("test");
+
                     new ReceiveThread().start();
 
                     if(listener!=null)
@@ -71,8 +81,19 @@ public class Client {
             String message;
             try {
                 while((message = socketInput.readLine()) != null) {   // each line must end with a \n to be received
-                    if(listener!=null)
-                        listener.onMessage(message);
+                    if(listener!=null) {
+                        final String finalMessage = message;
+                        activity.runOnUiThread(new Runnable() {
+                            public void run()
+                            {
+                                try {
+                                    listener.onMessage(finalMessage);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                                               });
+                    }
                 }
             } catch (IOException e) {
                 if(listener!=null)
@@ -90,7 +111,7 @@ public class Client {
     }
 
     public interface ClientCallback {
-        void onMessage(String message);
+        void onMessage(String message) throws JSONException;
         void onConnect(Socket socket);
         void onDisconnect(Socket socket, String message);
         void onConnectError(Socket socket, String message);

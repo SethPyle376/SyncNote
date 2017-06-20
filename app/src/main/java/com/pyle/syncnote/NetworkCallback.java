@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.widget.EditText;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.Socket;
 
@@ -23,10 +27,13 @@ public class NetworkCallback implements Client.ClientCallback {
     }
 
     @Override
-    public void onMessage(String message) {
+    public void onMessage(String message) throws JSONException {
         Log.d("NODEJS", message);
         Snackbar snackBar = Snackbar.make(((Activity)mainContext).findViewById(R.id.myCoordinatorLayout), message, LENGTH_SHORT);
         snackBar.show();
+        JSONObject jsonObject = new JSONObject(message);
+        EditText editor = (EditText) ((Activity)mainContext).findViewById(R.id.sharedText);
+        editor.setText(jsonObject.getString("data"));
     }
 
     @Override

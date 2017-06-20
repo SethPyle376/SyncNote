@@ -13,6 +13,9 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 public class MainMenu extends AppCompatActivity {
@@ -21,6 +24,7 @@ public class MainMenu extends AppCompatActivity {
     private ListView drawerList;
     private ArrayAdapter<String> adapter;
     private NetworkCallback callback;
+
     Client socket;
 
 
@@ -29,7 +33,7 @@ public class MainMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Set view to text editting
+        //Set view to text editing
         setContentView(R.layout.activity_text_editor);
         String[] drawerItems = { "Editor", "Notes"};
 
@@ -48,7 +52,7 @@ public class MainMenu extends AppCompatActivity {
 
         //Setup connection to server, send test message
         callback = new NetworkCallback(this);
-        socket = new Client("52.10.127.103", 3000);
+        socket = new Client("52.10.127.103", 3000, this);
         socket.setClientCallback(callback);
         socket.connect();
 
@@ -65,19 +69,28 @@ public class MainMenu extends AppCompatActivity {
         switch (item.getItemId()) {
             //When user presses menu at top left, this will open or close drawer
             case android.R.id.home:
-                try {
-                    socket.send("opened\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 if (drawer.isDrawerOpen(Gravity.LEFT)) {
-                drawer.closeDrawer(Gravity.LEFT);
+                    drawer.closeDrawer(Gravity.LEFT);
                 }
                 else {
                     drawer.openDrawer(Gravity.LEFT);
                 }
 
                 return true;
+
+            case R.id.action_menu:
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("command", "pull");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String sent = json.toString() + '\n';
+                try {
+                    socket.send(sent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
         return super.onOptionsItemSelected(item);
     }
