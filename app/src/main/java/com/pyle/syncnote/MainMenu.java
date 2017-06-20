@@ -11,12 +11,15 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainMenu extends AppCompatActivity {
     private Toolbar toolbar;
@@ -24,6 +27,7 @@ public class MainMenu extends AppCompatActivity {
     private ListView drawerList;
     private ArrayAdapter<String> adapter;
     private NetworkCallback callback;
+    private EditText editor;
 
     Client socket;
 
@@ -48,13 +52,27 @@ public class MainMenu extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_menu);
         setSupportActionBar(toolbar);
 
-
+        //Set up editor for writing/reading
+        editor = (EditText) findViewById(R.id.sharedText);
 
         //Setup connection to server, send test message
         callback = new NetworkCallback(this);
         socket = new Client("52.10.127.103", 3000, this);
         socket.setClientCallback(callback);
         socket.connect();
+
+        //Set up connection checker to reconnect if connection is lost
+        /*new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    socket.send("Ping");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 0, 15000);*/
+
 
     }
 
@@ -91,6 +109,22 @@ public class MainMenu extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                break;
+
+            case R.id.action_up:
+                JSONObject jsonNew = new JSONObject();
+                try {
+                    jsonNew.put("push", editor.getText());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String sentNew = jsonNew.toString() + '\n';
+                try {
+                    socket.send(sentNew);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

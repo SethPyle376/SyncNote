@@ -7,7 +7,12 @@
         android:icon="@android:drawable/ic_menu_more"
         android:gravity="left"
         android:title="@string/action_menu"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_up"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="action_up"
+        app:showAsAction="ifRoom" />
 
 </menu>

@@ -28,6 +28,7 @@ public class Client {
     private int port;
     private ClientCallback listener=null;
     private Activity activity;
+    private Boolean connected;
 
     public Client(String ip, int port, Activity activity){
         this.ip=ip;
@@ -47,6 +48,7 @@ public class Client {
                     socketInput = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                     new ReceiveThread().start();
+                    connected = true;
 
                     if(listener!=null)
                         listener.onConnect(socket);
@@ -71,9 +73,15 @@ public class Client {
         try {
             socketOutput.write(message.getBytes());
         } catch (IOException e) {
-            if(listener!=null)
+            if(listener!=null) {
                 listener.onDisconnect(socket, e.getMessage());
+                connected = false;
+            }
         }
+    }
+
+    public Boolean isConnected() throws IOException {
+        return connected;
     }
 
     private class ReceiveThread extends Thread implements Runnable{
