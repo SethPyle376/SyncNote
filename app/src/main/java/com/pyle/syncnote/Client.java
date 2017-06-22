@@ -2,7 +2,7 @@ package com.pyle.syncnote;
 
 import android.app.Activity;
 
-import com.google.gson.Gson;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
