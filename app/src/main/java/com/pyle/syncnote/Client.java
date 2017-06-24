@@ -1,7 +1,7 @@
 package com.pyle.syncnote;
 
 import android.app.Activity;
-
+import android.support.design.widget.Snackbar;
 
 
 import org.json.JSONException;
@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 
 
 /**
@@ -70,14 +72,23 @@ public class Client {
     }
 
     public void send(String message) throws IOException {
-        try {
-            socketOutput.write(message.getBytes());
-        } catch (IOException e) {
-            if(listener!=null) {
-                listener.onDisconnect(socket, e.getMessage());
-                connected = false;
+        final String finalMessage = message;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (socketOutput != null) {
+                    try {
+                        socketOutput.write(finalMessage.getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Snackbar snackBar = Snackbar.make(activity.findViewById(R.id.myCoordinatorLayout), "Connection problem", LENGTH_SHORT);
+                    snackBar.show();
+                    connect();
+                }
             }
-        }
+        }).start();
     }
 
     public Boolean isConnected() throws IOException {
