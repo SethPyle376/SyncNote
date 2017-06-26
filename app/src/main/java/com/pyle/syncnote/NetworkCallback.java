@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.Socket;
+import java.util.zip.Inflater;
 
 import static android.support.design.widget.BaseTransientBottomBar.LENGTH_LONG;
 import static android.support.design.widget.Snackbar.LENGTH_SHORT;
@@ -21,9 +23,11 @@ import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 public class NetworkCallback implements Client.ClientCallback {
 
     Context mainContext;
+    Activity mainActivity;
 
     public NetworkCallback(Context context) {
         mainContext = context;
+        mainActivity = (Activity) context;
     }
 
     @Override
@@ -32,7 +36,8 @@ public class NetworkCallback implements Client.ClientCallback {
         Snackbar snackBar = Snackbar.make(((Activity)mainContext).findViewById(R.id.myCoordinatorLayout), message, LENGTH_SHORT);
         snackBar.show();
         JSONObject jsonObject = new JSONObject(message);
-        EditText editor = (EditText) ((Activity)mainContext).findViewById(R.id.sharedText);
+
+        EditText editor = (EditText) mainActivity.findViewById(R.id.sharedText);
         editor.setText(jsonObject.getString("data"));
     }
 

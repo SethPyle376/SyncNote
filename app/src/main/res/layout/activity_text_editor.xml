@@ -34,12 +34,13 @@
         android:background="#ffffff">
 
         <!-- The main content view -->
+
         <FrameLayout
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <EditText
+            <!-- <EditText
                 android:id="@+id/sharedText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -48,7 +49,7 @@
                 android:gravity="top|left"
                 android:inputType="textMultiLine"
                 tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="16dp" />
+                tools:layout_editor_absoluteY="16dp" /> -->
         </FrameLayout>
         <!-- The navigation drawer -->
         <ListView android:id="@+id/left_drawer"

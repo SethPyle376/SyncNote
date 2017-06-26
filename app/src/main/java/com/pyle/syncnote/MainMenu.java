@@ -1,8 +1,12 @@
 package com.pyle.syncnote;
 
+
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.support.v4.app.FragmentManager;
+
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,8 +32,10 @@ public class MainMenu extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private NetworkCallback callback;
     private EditText editor;
+    private FragmentManager fragManager;
 
     Client socket;
+
 
 
 
@@ -53,13 +59,19 @@ public class MainMenu extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Set up editor for writing/reading
-        editor = (EditText) findViewById(R.id.sharedText);
+
 
         //Setup connection to server, send test message
         callback = new NetworkCallback(this);
         socket = new Client("52.10.127.103", 3000, this);
         socket.setClientCallback(callback);
         socket.connect();
+
+        NoteList newNoteList = new NoteList();
+
+        getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNoteList, "notelist").commit();
+
+
 
         //Set up connection checker to reconnect if connection is lost
         /*new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -112,9 +124,10 @@ public class MainMenu extends AppCompatActivity {
                 break;
 
             case R.id.action_up:
+                EditText tempEditor = (EditText) findViewById(R.id.sharedText);
                 JSONObject jsonNew = new JSONObject();
                 try {
-                    jsonNew.put("push", editor.getText());
+                    jsonNew.put("push", tempEditor.getText());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
