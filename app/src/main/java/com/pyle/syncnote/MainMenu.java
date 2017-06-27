@@ -4,6 +4,7 @@ package com.pyle.syncnote;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import android.support.v4.app.FragmentTransaction;
@@ -11,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,12 +46,17 @@ public class MainMenu extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        fragManager = getSupportFragmentManager();
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);
         String[] drawerItems = { "Editor", "Notes"};
 
-        callback = new NetworkCallback(this, getSupportFragmentManager());
+        //Set up toolbar
+        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_menu);
+        setSupportActionBar(toolbar);
+
+        callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar);
         socket = new Client("52.10.127.103", 4000, this);
         socket.setClientCallback(callback);
         socket.connect();
@@ -62,12 +69,12 @@ public class MainMenu extends AppCompatActivity {
         drawerListener = new DrawerItemClickListener(getSupportFragmentManager(), drawer, socket);
         drawerList.setOnItemClickListener(drawerListener);
 
-        //Set up toolbar
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_menu);
-        setSupportActionBar(toolbar);
 
+
+        Bundle noteBundle = new Bundle();
+        noteBundle.putString("title", "default");
         NoteFragment newNoteList = new NoteFragment();
+        newNoteList.setArguments(noteBundle);
         getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNoteList, "notepad").commit();
 
     }
@@ -93,33 +100,44 @@ public class MainMenu extends AppCompatActivity {
                 return true;
 
             case R.id.action_menu:
-                JSONObject json = new JSONObject();
-                try {
-                    json.put("command", "pull");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                String sent = json.toString() + '\n';
-                try {
-                    socket.send(sent);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                NoteFragment noteFrag = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                if (noteFrag != null) {
+                    String title = noteFrag.title;
+                    JSONObject json = new JSONObject();
+                    try {
+                        json.put("command", "pull");
+                        json.put("target", title);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String sent = json.toString() + '\n';
+                    try {
+                        Log.d("nodejs", sent);
+                        socket.send(sent);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
 
             case R.id.action_up:
-                EditText tempEditor = (EditText) findViewById(R.id.sharedText);
-                JSONObject jsonNew = new JSONObject();
-                try {
-                    jsonNew.put("push", tempEditor.getText());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                String sentNew = jsonNew.toString() + '\n';
-                try {
-                    socket.send(sentNew);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                if (noteFragment != null) {
+                    EditText tempEditor = (EditText) findViewById(R.id.sharedText);
+                    JSONObject jsonNew = new JSONObject();
+                    try {
+                        jsonNew.put("command", "push");
+                        jsonNew.put("target", noteFragment.title);
+                        jsonNew.put("data", tempEditor.getText());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String sentNew = jsonNew.toString() + '\n';
+                    try {
+                        socket.send(sentNew);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }

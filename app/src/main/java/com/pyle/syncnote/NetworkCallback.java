@@ -2,16 +2,21 @@ package com.pyle.syncnote;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,13 +39,15 @@ public class NetworkCallback implements Client.ClientCallback {
     FragmentManager fragMan;
     ArrayList<String> list;
     String designatedNote;
+    Toolbar mainToolbar;
 
 
-    public NetworkCallback(Context context, FragmentManager fragMan) {
+    public NetworkCallback(Context context, FragmentManager fragMan, Toolbar mainToolbar) {
         mainContext = context;
         mainActivity = (Activity) context;
         this.fragMan = fragMan;
         list = new ArrayList<String>();
+        this.mainToolbar = mainToolbar;
     }
 
     public String getDesignatedNote() {
@@ -64,18 +71,28 @@ public class NetworkCallback implements Client.ClientCallback {
                 }
                 Log.d("nodejs", "Added to list");
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(mainActivity, android.R.layout.simple_list_item_1, list);
-                ListView notesList = (ListView) mainActivity.findViewById(R.id.notelist);
+                final ListView notesList = (ListView) mainActivity.findViewById(R.id.notelist);
                 notesList.setAdapter(adapter);
+                notesList.setOnItemClickListener(new ListView.OnItemClickListener() {
+
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String text = notesList.getItemAtPosition(position).toString().trim();
+                        Bundle noteBundle = new Bundle();
+                        noteBundle.putString("title", text);
+                        Fragment noteFrag = new NoteFragment();
+                        noteFrag.setArguments(noteBundle);
+                        mainToolbar.setTitle(text);
+                        fragMan.beginTransaction()
+                                .replace(R.id.content_frame, noteFrag, "notepad")
+                                .commit();
+                    }});
             }
-
-
-
         }
-
-
-        if (fragMan.findFragmentByTag("notepad") != null) {
+        else if (command.equals("update")) {
             EditText editor = (EditText) mainActivity.findViewById(R.id.sharedText);
-            editor.setText(jsonObject.getString("data"));
+            if (editor != null) {
+                editor.setText(jsonObject.getString("data"));
+            }
         }
     }
 
