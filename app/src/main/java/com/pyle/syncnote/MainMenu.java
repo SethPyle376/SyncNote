@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,6 +34,7 @@ public class MainMenu extends AppCompatActivity {
     private NetworkCallback callback;
     private EditText editor;
     private FragmentManager fragManager;
+    private DrawerItemClickListener drawerListener;
 
     Client socket;
 
@@ -47,44 +49,26 @@ public class MainMenu extends AppCompatActivity {
         setContentView(R.layout.activity_text_editor);
         String[] drawerItems = { "Editor", "Notes"};
 
+        callback = new NetworkCallback(this, getSupportFragmentManager());
+        socket = new Client("52.10.127.103", 4000, this);
+        socket.setClientCallback(callback);
+        socket.connect();
+
         //Grab drawer for later
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems);
         drawerList.setAdapter(adapter);
+        drawerListener = new DrawerItemClickListener(getSupportFragmentManager(), drawer, socket);
+        drawerList.setOnItemClickListener(drawerListener);
 
         //Set up toolbar
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_menu);
         setSupportActionBar(toolbar);
 
-        //Set up editor for writing/reading
-
-
-        //Setup connection to server, send test message
-        callback = new NetworkCallback(this);
-        socket = new Client("52.10.127.103", 3000, this);
-        socket.setClientCallback(callback);
-        socket.connect();
-
-        NoteList newNoteList = new NoteList();
-
-        getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNoteList, "notelist").commit();
-
-
-
-        //Set up connection checker to reconnect if connection is lost
-        /*new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    socket.send("Ping");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 0, 15000);*/
-
+        NoteFragment newNoteList = new NoteFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNoteList, "notepad").commit();
 
     }
 
