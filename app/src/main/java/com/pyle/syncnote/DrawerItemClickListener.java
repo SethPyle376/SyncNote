@@ -2,6 +2,7 @@ package com.pyle.syncnote;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -40,11 +41,10 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     private void selectItem(int position) {
         if (position == 0)
         {
+            Bundle args = new Bundle();
+            args.putString("title", "default");
             Fragment noteFrag = new NoteFragment();
-            if (fragMan.findFragmentByTag("notepad") != null && fragMan.findFragmentByTag("notepad").isVisible()) {
-                drawer.closeDrawer(Gravity.LEFT);
-                return;
-            }
+            noteFrag.setArguments(args);
             fragMan.beginTransaction()
                     .replace(R.id.content_frame, noteFrag, "notepad")
                     .commit();

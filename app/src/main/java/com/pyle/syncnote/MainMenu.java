@@ -1,6 +1,8 @@
 package com.pyle.syncnote;
 
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -9,13 +11,18 @@ import android.support.v4.app.FragmentManager;
 
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -27,6 +34,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static java.security.AccessController.getContext;
 
 public class MainMenu extends AppCompatActivity {
     private Toolbar toolbar;
@@ -49,7 +58,7 @@ public class MainMenu extends AppCompatActivity {
         fragManager = getSupportFragmentManager();
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);
-        String[] drawerItems = { "Editor", "Notes"};
+        String[] drawerItems = { "New Note", "Notes"};
 
         //Set up toolbar
         toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -121,22 +130,68 @@ public class MainMenu extends AppCompatActivity {
                 break;
 
             case R.id.action_up:
-                NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                final NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+
                 if (noteFragment != null) {
-                    EditText tempEditor = (EditText) findViewById(R.id.sharedText);
-                    JSONObject jsonNew = new JSONObject();
-                    try {
-                        jsonNew.put("command", "push");
-                        jsonNew.put("target", noteFragment.title);
-                        jsonNew.put("data", tempEditor.getText());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    final String[] noteTitle = new String[1];
+
+                    if (noteFragment.title.equals("default")) {
+                        Log.d("nodejs", "entering alerter");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Title");
+                        final EditText input = new EditText(this);
+                        input.setInputType(InputType.TYPE_CLASS_TEXT);
+                        builder.setView(input);
+
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                noteTitle[0] = input.getText().toString();
+                                noteFragment.title = noteTitle[0];
+                                toolbar.setTitle(noteFragment.title);
+                                EditText tempEditor = (EditText) findViewById(R.id.sharedText);
+                                JSONObject jsonNew = new JSONObject();
+                                try {
+                                    jsonNew.put("command", "push");
+                                    jsonNew.put("target", noteFragment.title);
+                                    jsonNew.put("data", tempEditor.getText());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                String sentNew = jsonNew.toString() + '\n';
+                                try {
+                                    socket.send(sentNew);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        builder.show();
+
                     }
-                    String sentNew = jsonNew.toString() + '\n';
-                    try {
-                        socket.send(sentNew);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+
+                    else {
+                        EditText tempEditor = (EditText) findViewById(R.id.sharedText);
+                        JSONObject jsonNew = new JSONObject();
+                        try {
+                            jsonNew.put("command", "push");
+                            jsonNew.put("target", noteFragment.title);
+                            jsonNew.put("data", tempEditor.getText());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        String sentNew = jsonNew.toString() + '\n';
+                        try {
+                            socket.send(sentNew);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 break;
