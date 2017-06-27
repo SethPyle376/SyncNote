@@ -138,7 +138,7 @@ public class MainMenu extends AppCompatActivity {
                     if (noteFragment.title.equals("default")) {
                         Log.d("nodejs", "entering alerter");
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("Title");
+                        builder.setTitle("Please enter a title for your note");
                         final EditText input = new EditText(this);
                         input.setInputType(InputType.TYPE_CLASS_TEXT);
                         builder.setView(input);
