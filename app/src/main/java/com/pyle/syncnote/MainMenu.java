@@ -51,6 +51,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+/**
+ * This is our main class that gets everything ready. It creates our toolbar, nav drawer,
+ * and floating action button and handles them.
+ */
 public class MainMenu extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
     private Toolbar toolbar;
@@ -60,47 +64,99 @@ public class MainMenu extends AppCompatActivity
     private NetworkCallback callback;
     private EditText editor;
     private android.support.v4.app.FragmentManager fragManager;
+    private Context myActivity;
+    private FloatingActionButton fab;
 
 
     Client socket;
 
 
-
-
+    /**
+     * This sets everything up and gets it ready to go. Drawer, toolbar, and buttons are all
+     * initialized. The network connection to the server is also initialized here. Finally a notepad
+     * fragment is initialized and presented to the user.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragManager = getSupportFragmentManager();
+
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);
-
-        //May not be necessary anymore
-        //String[] drawerItems = { "New Note", "Notes"};
+        myActivity = this;
 
         //Set up toolbar
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_menu);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            });
-        }
+                                       @Override
+                                       public void onClick(View view) {
+                                           final NoteFragment noteFragment = (NoteFragment) fragManager.findFragmentByTag("notepad");
+
+                                           if (noteFragment != null) {
+                                               final String[] noteTitle = new String[1];
+                                               if (noteFragment.title.equals("default")) {
+                                                   Log.d("nodejs", "entering alerter");
+                                                   AlertDialog.Builder builder = new AlertDialog.Builder(myActivity);
+                                                   builder.setTitle("Please enter a title for your note");
+                                                   final EditText input = new EditText(myActivity);
+                                                   input.setInputType(InputType.TYPE_CLASS_TEXT);
+                                                   builder.setView(input);
+
+                                                   builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                       @Override
+                                                       public void onClick(DialogInterface dialog, int which) {
+                                                           noteTitle[0] = input.getText().toString();
+                                                           noteFragment.title = noteTitle[0];
+                                                           toolbar.setTitle(noteFragment.title);
+                                                           EditText tempEditor = (EditText) findViewById(R.id.sharedText);
+                                                           JSONObject jsonNew = new JSONObject();
+                                                           try {
+                                                               jsonNew.put("command", "push");
+                                                               jsonNew.put("target", noteFragment.title);
+                                                               jsonNew.put("data", tempEditor.getText());
+                                                           } catch (JSONException e) {
+                                                               e.printStackTrace();
+                                                           }
+                                                           String sentNew = jsonNew.toString() + '\n';
+                                                           try {
+                                                               socket.send(sentNew);
+                                                               fab.hide();
+                                                           } catch (IOException e) {
+                                                               e.printStackTrace();
+                                                           }
+                                                       }
+                                                   });
+                                                   builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                       @Override
+                                                       public void onClick(DialogInterface dialog, int which) {
+                                                           dialog.cancel();
+                                                       }
+                                                   });
+                                                   builder.show();
+
+
+                                               }
+                                           }
+                                           ;
+                                       }
+                                   });
+        };
 
 
 
-        callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar);
+
+        callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar, fab);
         socket = new Client("52.10.127.103", 4000, this);
         socket.setClientCallback(callback);
         socket.connect();
 
-        //Not sure if this goes here or at the end
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -114,22 +170,18 @@ public class MainMenu extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        //May not be necessary either
-        // Grab drawer for later
-        //drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //drawerList = (ListView) findViewById(R.id.left_drawer);
-        //adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems);
-        //drawerList.setAdapter(adapter);
-
-
+        toolbar.setTitle("New Note");
         Bundle noteBundle = new Bundle();
         noteBundle.putString("title", "default");
-        NoteFragment newNoteList = new NoteFragment();
-        newNoteList.setArguments(noteBundle);
-        getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNoteList, "notepad").commit();
+        NoteFragment newNote = new NoteFragment();
+        newNote.setArguments(noteBundle);
+        getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNote, "notepad").commit();
 
     }
 
+    /**
+     * This is a button callback function for the menu button, to open and close the drawer.
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -140,6 +192,11 @@ public class MainMenu extends AppCompatActivity
         }
     }
 
+    /**
+     * Inflates the toolbar menu
+     * @param menu
+     * @return bool Whether or not it was successful
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // This will get deleted and changed with the text editor UI later on
@@ -147,19 +204,15 @@ public class MainMenu extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Callback functions for handling button presses to either upload or download
+     * a note to the server.
+     * @param item Button in question
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            //When user presses menu at top left, this will open or close drawer
-            case R.id.action_settings:
-                //if (drawer.isDrawerOpen(Gravity.LEFT)) {
-                //   drawer.closeDrawer(Gravity.LEFT);
-                //}
-                //else {
-                //    drawer.openDrawer(Gravity.LEFT);
-                //}
-                return true;
-
             case R.id.action_menu:
                 NoteFragment noteFrag = (NoteFragment)fragManager.findFragmentByTag("notepad");
                 if (noteFrag != null) {
@@ -251,6 +304,11 @@ public class MainMenu extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Another button callback handler, used for buttons in the navigation drawer.
+     * @param item
+     * @return
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -260,15 +318,18 @@ public class MainMenu extends AppCompatActivity
 
         if (id == R.id.nav_new) {
             Bundle bundle = new Bundle();
+            toolbar.setTitle("New Note");
             bundle.putString("title", "default");
             NoteFragment newNoteList = new NoteFragment();
             newNoteList.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNoteList, "notepad").commit();
-        } else if (id == R.id.nav_navigate) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, newNoteList, "notepad").commit();
+        }
+        else if (id == R.id.nav_navigate) {
             fragManager.beginTransaction()
                     .replace(R.id.content_frame
                             , new NoteListFragment(), "noteList")
                     .commit();
+            fab.show();
             JSONObject json = new JSONObject();
             try {
                 json.put("command", "list");
