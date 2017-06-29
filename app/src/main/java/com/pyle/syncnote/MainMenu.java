@@ -59,7 +59,7 @@ public class MainMenu extends AppCompatActivity
     private ArrayAdapter<String> adapter;
     private NetworkCallback callback;
     private EditText editor;
-    private android.app.FragmentManager fragManager;
+    private android.support.v4.app.FragmentManager fragManager;
 
 
     Client socket;
@@ -70,7 +70,7 @@ public class MainMenu extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //fragManager = getSupportFragmentManager();
+        fragManager = getSupportFragmentManager();
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);
 
@@ -83,13 +83,15 @@ public class MainMenu extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            });
+        }
 
 
 
@@ -105,8 +107,12 @@ public class MainMenu extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = new NavigationView(this);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+
         navigationView.setNavigationItemSelectedListener(this);
+
 
         //May not be necessary either
         // Grab drawer for later
@@ -250,18 +256,33 @@ public class MainMenu extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        fragManager = getFragmentManager();
+
 
         if (id == R.id.nav_new) {
-            fragManager.beginTransaction()
-                    .replace(R.id.content_frame
-                            , new NoteFragment())
-                    .commit();
+            Bundle bundle = new Bundle();
+            bundle.putString("title", "default");
+            NoteFragment newNoteList = new NoteFragment();
+            newNoteList.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNoteList, "notepad").commit();
         } else if (id == R.id.nav_navigate) {
             fragManager.beginTransaction()
                     .replace(R.id.content_frame
-                            , new NoteListFragment())
+                            , new NoteListFragment(), "noteList")
                     .commit();
+            JSONObject json = new JSONObject();
+            try {
+                json.put("command", "list");
+                json.put("data", "");
+                json.put("target", "");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String sent = json.toString() + '\n';
+            try {
+                socket.send(sent);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {

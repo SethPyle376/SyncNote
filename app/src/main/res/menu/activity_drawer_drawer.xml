@@ -5,11 +5,11 @@
         <item
             android:id="@+id/nav_new"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:title="New Note" />
         <item
             android:id="@+id/nav_navigate"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="Note List" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
