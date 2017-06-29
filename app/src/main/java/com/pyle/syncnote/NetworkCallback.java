@@ -3,6 +3,7 @@ package com.pyle.syncnote;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -40,14 +41,16 @@ public class NetworkCallback implements Client.ClientCallback {
     ArrayList<String> list;
     String designatedNote;
     Toolbar mainToolbar;
+    FloatingActionButton fab;
 
 
-    public NetworkCallback(Context context, FragmentManager fragMan, Toolbar mainToolbar) {
+    public NetworkCallback(Context context, FragmentManager fragMan, Toolbar mainToolbar, FloatingActionButton fab) {
         mainContext = context;
         mainActivity = (Activity) context;
         this.fragMan = fragMan;
         list = new ArrayList<String>();
         this.mainToolbar = mainToolbar;
+        this.fab = fab;
     }
 
     public String getDesignatedNote() {
@@ -76,6 +79,7 @@ public class NetworkCallback implements Client.ClientCallback {
                 notesList.setOnItemClickListener(new ListView.OnItemClickListener() {
 
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        fab.hide();
                         String text = notesList.getItemAtPosition(position).toString().trim();
                         Bundle noteBundle = new Bundle();
                         noteBundle.putString("title", text);
