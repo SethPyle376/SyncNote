@@ -20,7 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#0000ff"
+            android:background="#159f34"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/MyToolbarStyle"
             app:titleTextColor="@android:color/white">
@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"
                     android:layout_margin="@dimen/fab_margin"
-                    app:srcCompat="@android:drawable/ic_dialog_email" />
+                    app:srcCompat="@android:drawable/ic_input_add" />
             </FrameLayout>
 
             <android.support.design.widget.NavigationView

@@ -74,9 +74,6 @@ public class MainMenu extends AppCompatActivity
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);
 
-        //May not be necessary anymore
-        //String[] drawerItems = { "New Note", "Notes"};
-
         //Set up toolbar
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_menu);
@@ -100,7 +97,6 @@ public class MainMenu extends AppCompatActivity
         socket.setClientCallback(callback);
         socket.connect();
 
-        //Not sure if this goes here or at the end
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -112,15 +108,6 @@ public class MainMenu extends AppCompatActivity
 
 
         navigationView.setNavigationItemSelectedListener(this);
-
-
-        //May not be necessary either
-        // Grab drawer for later
-        //drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //drawerList = (ListView) findViewById(R.id.left_drawer);
-        //adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, drawerItems);
-        //drawerList.setAdapter(adapter);
-
 
         Bundle noteBundle = new Bundle();
         noteBundle.putString("title", "default");
@@ -142,7 +129,7 @@ public class MainMenu extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // This will get deleted and changed with the text editor UI later on
+        // This will get changed with the text editor UI later on
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
