@@ -14,7 +14,7 @@
         android:layout_height="wrap_content">
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_color"
+            android:id="@+id/fab_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
@@ -24,7 +24,7 @@
             app:srcCompat="@android:drawable/ic_input_add" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_bold"
+            android:id="@+id/fab_bullet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
@@ -34,7 +34,7 @@
             android:src="@android:drawable/ic_input_add"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
-            app:layout_anchor="@id/fab_color"
+            app:layout_anchor="@id/fab_box"
             app:layout_anchorGravity="top" />
 
         <android.support.design.widget.FloatingActionButton
@@ -46,16 +46,16 @@
             android:src="@android:drawable/ic_input_add"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
-            app:layout_anchor="@id/fab_color"
+            app:layout_anchor="@id/fab_box"
             app:layout_anchorGravity="top" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_bullet"
+            android:id="@+id/fab_bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top|start"
-            android:layout_marginStart="95dp"
             android:layout_marginLeft="95dp"
+            android:layout_marginStart="95dp"
             android:layout_marginTop="16dp"
             android:src="@android:drawable/ic_input_add"
             android:visibility="visible"
@@ -65,17 +65,17 @@
             app:layout_anchorGravity="end" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_box"
+            android:id="@+id/fab_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top|start"
-            android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:src="@android:drawable/ic_input_add"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
-            app:layout_anchor="@id/fab_color"
+            app:layout_anchor="@id/fab_box"
             app:layout_anchorGravity="top" />
     </FrameLayout>
 
