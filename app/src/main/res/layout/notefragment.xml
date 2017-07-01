@@ -21,7 +21,7 @@
             android:layout_margin="@dimen/fab_margin"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
-            app:srcCompat="@android:drawable/ic_input_add" />
+            app:srcCompat="@drawable/ic_check_box" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_bullet"
@@ -31,7 +31,7 @@
             android:layout_marginEnd="95dp"
             android:layout_marginRight="95dp"
             android:layout_marginTop="16dp"
-            android:src="@android:drawable/ic_input_add"
+            android:src="@drawable/ic_bullet_point"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
             app:layout_anchor="@id/fab_box"
@@ -45,7 +45,7 @@
             android:layout_marginLeft="174dp"
             android:layout_marginStart="174dp"
             android:layout_marginTop="16dp"
-            android:src="@android:drawable/ic_input_add"
+            android:src="@drawable/ic_font_italic"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
             app:layout_anchor="@id/fab_box"
@@ -59,7 +59,7 @@
             android:layout_marginLeft="95dp"
             android:layout_marginStart="95dp"
             android:layout_marginTop="16dp"
-            android:src="@android:drawable/ic_input_add"
+            android:src="@drawable/ic_font_bold"
             android:visibility="visible"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
@@ -74,7 +74,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:src="@android:drawable/ic_input_add"
+            android:src="@drawable/ic_fontcolor_black"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
             app:layout_anchor="@id/fab_box"
