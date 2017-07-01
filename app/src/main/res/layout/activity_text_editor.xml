@@ -27,8 +27,6 @@
         </android.support.v7.widget.Toolbar>
 
 
-
-
         <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
@@ -42,11 +40,13 @@
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/fab"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"
                     android:layout_margin="@dimen/fab_margin"
+                    app:backgroundTint="@android:color/background_light"
                     app:srcCompat="@android:drawable/ic_input_add" />
+
             </FrameLayout>
 
             <android.support.design.widget.NavigationView
