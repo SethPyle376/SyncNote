@@ -50,6 +50,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 /**
  * This is our main class that gets everything ready. It creates our toolbar, nav drawer,
@@ -57,6 +58,9 @@ import android.view.MenuItem;
  */
 public class MainMenu extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
+
+    private String clientName;
+    private String clientEmail;
     private Toolbar toolbar;
     private DrawerLayout drawer;
     private ListView drawerList;
@@ -66,6 +70,7 @@ public class MainMenu extends AppCompatActivity
     private android.support.v4.app.FragmentManager fragManager;
     private Context myActivity;
     private FloatingActionButton fab;
+    private NavigationView navigationView;
 
 
     Client socket;
@@ -81,6 +86,9 @@ public class MainMenu extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragManager = getSupportFragmentManager();
+
+        clientName = getIntent().getStringExtra("name");
+        clientEmail = getIntent().getStringExtra("email");
 
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);
@@ -163,8 +171,10 @@ public class MainMenu extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = new NavigationView(this);
+        navigationView = new NavigationView(this);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+
 
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -176,6 +186,8 @@ public class MainMenu extends AppCompatActivity
         NoteFragment newNote = new NoteFragment();
         newNote.setArguments(noteBundle);
         getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNote, "notepad").commit();
+
+
 
     }
 
@@ -201,6 +213,10 @@ public class MainMenu extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // This will get deleted and changed with the text editor UI later on
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        TextView nameText = (TextView)navigationView.findViewById(R.id.nameView);
+        nameText.setText(clientName);
+        nameText = (TextView)navigationView.findViewById(R.id.emailView);
+        nameText.setText(clientEmail);
         return true;
     }
 

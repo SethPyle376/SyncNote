@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "530308106879",
+    "project_id": "syncnote-5c0cd"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530308106879:android:32cee497b0d74629",
+        "android_client_info": {
+          "package_name": "com.pyle.syncnote"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "530308106879-cctnbbg8fman20nr5ii5559ihmg8i553.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pyle.syncnote",
+            "certificate_hash": "a758bac14d11924c7dbc691ac9bcc0cc3feb7c7f"
+          }
+        },
+        {
+          "client_id": "530308106879-qk1i0tlhcfq08mc03p1sas4i34l3s7lc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvk4MjZ29-kXpOPwHA3t4rEAu-9Nn7tQM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
