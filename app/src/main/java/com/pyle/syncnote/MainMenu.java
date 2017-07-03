@@ -3,6 +3,8 @@ package com.pyle.syncnote;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -25,16 +27,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.pyle.syncnote.R.id.imageView;
 import static java.security.AccessController.getContext;
 
 
@@ -61,6 +67,7 @@ public class MainMenu extends AppCompatActivity
 
     private String clientName;
     private String clientEmail;
+    private String clientPicture;
     private Toolbar toolbar;
     private DrawerLayout drawer;
     private ListView drawerList;
@@ -71,6 +78,7 @@ public class MainMenu extends AppCompatActivity
     private Context myActivity;
     private FloatingActionButton fab;
     private NavigationView navigationView;
+    private URL photoURL;
 
 
     Client socket;
@@ -89,6 +97,8 @@ public class MainMenu extends AppCompatActivity
 
         clientName = getIntent().getStringExtra("name");
         clientEmail = getIntent().getStringExtra("email");
+        clientPicture = getIntent().getStringExtra("picture");
+        Log.d("nodejs", clientPicture);
 
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);
@@ -160,9 +170,11 @@ public class MainMenu extends AppCompatActivity
 
 
         callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar, fab);
-        socket = new Client("52.10.127.103", 4000, this);
+        socket = new Client("52.10.127.103", 5000, this);
         socket.setClientCallback(callback);
         socket.connect();
+
+
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,8 +199,26 @@ public class MainMenu extends AppCompatActivity
         newNote.setArguments(noteBundle);
         getSupportFragmentManager().beginTransaction().add(R.id.content_frame, newNote, "notepad").commit();
 
-
-
+        //Give the socket time to connect before sending login right after.
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("command", "login");
+                    json.put("target", clientEmail);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String sent = json.toString() + '\n';
+                try {
+                    Log.d("nodejs", sent);
+                    socket.send(sent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 1000);
     }
 
     /**
@@ -217,6 +247,45 @@ public class MainMenu extends AppCompatActivity
         nameText.setText(clientName);
         nameText = (TextView)navigationView.findViewById(R.id.emailView);
         nameText.setText(clientEmail);
+
+
+
+        URL url = null;
+        try {
+            url = new URL(clientPicture);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        final Bitmap[] bmp = {null};
+        if (url != null) {
+            final URL finalUrl = url;
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        bmp[0] = BitmapFactory.decodeStream(finalUrl.openConnection().getInputStream());
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ImageView image = (ImageView) navigationView.findViewById(R.id.imageView);
+                                image.setImageBitmap(bmp[0]);
+
+                            }
+                        });
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
+
+
+
         return true;
     }
 

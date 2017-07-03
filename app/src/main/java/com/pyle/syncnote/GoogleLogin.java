@@ -37,6 +37,7 @@ public class GoogleLogin extends AppCompatActivity implements
         setContentView(R.layout.activity_google_login);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestProfile()
                 .requestEmail()
                 .build();
 
@@ -62,6 +63,7 @@ public class GoogleLogin extends AppCompatActivity implements
             Intent intent = new Intent(getBaseContext(), MainMenu.class);
             intent.putExtra("name", acct.getDisplayName());
             intent.putExtra("email", acct.getEmail());
+            intent.putExtra("picture", acct.getPhotoUrl().toString());
             startActivity(intent);
         }
 
