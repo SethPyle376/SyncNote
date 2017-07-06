@@ -170,7 +170,7 @@ public class MainMenu extends AppCompatActivity
 
 
         callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar, fab);
-        socket = new Client("52.10.127.103", 5000, this);
+        socket = new Client("52.10.127.103", 6000, this);
         socket.setClientCallback(callback);
         socket.connect();
 
@@ -431,8 +431,40 @@ public class MainMenu extends AppCompatActivity
             }
         }  else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Please enter a Gmail address to share with.");
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
 
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String newEmail = input.getText().toString();
+                    NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                    JSONObject jsonNew = new JSONObject();
+                    try {
+                        jsonNew.put("command", "addUser");
+                        jsonNew.put("target", noteFragment.title);
+                        jsonNew.put("data", newEmail);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String sentNew = jsonNew.toString() + '\n';
+                    try {
+                        socket.send(sentNew);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
