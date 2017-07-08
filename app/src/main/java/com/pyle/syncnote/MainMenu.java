@@ -98,7 +98,7 @@ public class MainMenu extends AppCompatActivity
         clientName = getIntent().getStringExtra("name");
         clientEmail = getIntent().getStringExtra("email");
         clientPicture = getIntent().getStringExtra("picture");
-        Log.d("nodejs", clientPicture);
+
 
         //Set view to text editing
         setContentView(R.layout.activity_text_editor);

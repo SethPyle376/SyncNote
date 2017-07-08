@@ -63,7 +63,9 @@ public class GoogleLogin extends AppCompatActivity implements
             Intent intent = new Intent(getBaseContext(), MainMenu.class);
             intent.putExtra("name", acct.getDisplayName());
             intent.putExtra("email", acct.getEmail());
-            intent.putExtra("picture", acct.getPhotoUrl().toString());
+            if(acct.getPhotoUrl() != null) {
+                intent.putExtra("picture", acct.getPhotoUrl().toString());
+            }
             startActivity(intent);
         }
 
