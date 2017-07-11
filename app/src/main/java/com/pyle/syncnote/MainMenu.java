@@ -17,7 +17,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -63,7 +65,7 @@ import android.widget.TextView;
  * and floating action button and handles them.
  */
 public class MainMenu extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private String clientName;
     private String clientEmail;
@@ -88,6 +90,7 @@ public class MainMenu extends AppCompatActivity
      * This sets everything up and gets it ready to go. Drawer, toolbar, and buttons are all
      * initialized. The network connection to the server is also initialized here. Finally a notepad
      * fragment is initialized and presented to the user.
+     *
      * @param savedInstanceState
      */
     @Override
@@ -105,76 +108,73 @@ public class MainMenu extends AppCompatActivity
         myActivity = this;
 
         //Set up toolbar
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_menu);
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View view) {
-                                           final NoteFragment noteFragment = (NoteFragment) fragManager.findFragmentByTag("notepad");
+                @Override
+                public void onClick(View view) {
+                    final NoteFragment noteFragment = (NoteFragment) fragManager.findFragmentByTag("notepad");
 
-                                           if (noteFragment != null) {
-                                               final String[] noteTitle = new String[1];
-                                               if (noteFragment.title.equals("default")) {
-                                                   Log.d("nodejs", "entering alerter");
-                                                   AlertDialog.Builder builder = new AlertDialog.Builder(myActivity);
-                                                   builder.setTitle("Please enter a title for your note");
-                                                   final EditText input = new EditText(myActivity);
-                                                   input.setInputType(InputType.TYPE_CLASS_TEXT);
-                                                   builder.setView(input);
+                    if (noteFragment != null) {
+                        final String[] noteTitle = new String[1];
+                        if (noteFragment.title.equals("default")) {
+                            Log.d("nodejs", "entering alerter");
+                            AlertDialog.Builder builder = new AlertDialog.Builder(myActivity);
+                            builder.setTitle("Please enter a title for your note");
+                            final EditText input = new EditText(myActivity);
+                            input.setInputType(InputType.TYPE_CLASS_TEXT);
+                            builder.setView(input);
 
-                                                   builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                       @Override
-                                                       public void onClick(DialogInterface dialog, int which) {
-                                                           noteTitle[0] = input.getText().toString();
-                                                           noteFragment.title = noteTitle[0];
-                                                           toolbar.setTitle(noteFragment.title);
-                                                           EditText tempEditor = (EditText) findViewById(R.id.sharedText);
-                                                           JSONObject jsonNew = new JSONObject();
-                                                           try {
-                                                               jsonNew.put("command", "push");
-                                                               jsonNew.put("target", noteFragment.title);
-                                                               jsonNew.put("data", tempEditor.getText());
-                                                           } catch (JSONException e) {
-                                                               e.printStackTrace();
-                                                           }
-                                                           String sentNew = jsonNew.toString() + '\n';
-                                                           try {
-                                                               socket.send(sentNew);
-                                                               fab.hide();
-                                                           } catch (IOException e) {
-                                                               e.printStackTrace();
-                                                           }
-                                                       }
-                                                   });
-                                                   builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                       @Override
-                                                       public void onClick(DialogInterface dialog, int which) {
-                                                           dialog.cancel();
-                                                       }
-                                                   });
-                                                   builder.show();
-
-
-                                               }
-                                           }
-                                           ;
-                                       }
-                                   });
-        };
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    noteTitle[0] = input.getText().toString();
+                                    noteFragment.title = noteTitle[0];
+                                    toolbar.setTitle(noteFragment.title);
+                                    EditText tempEditor = (EditText) findViewById(R.id.sharedText);
+                                    JSONObject jsonNew = new JSONObject();
+                                    try {
+                                        jsonNew.put("command", "push");
+                                        jsonNew.put("target", noteFragment.title);
+                                        jsonNew.put("data", tempEditor.getText());
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    String sentNew = jsonNew.toString() + '\n';
+                                    try {
+                                        socket.send(sentNew);
+                                        fab.hide();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                            builder.show();
 
 
+                        }
+                    }
+                    ;
+                }
+            });
+        }
+        ;
 
-
-        callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar, fab);
         socket = new Client("52.10.127.103", 6000, this);
+        callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar, fab, this);
+
         socket.setClientCallback(callback);
         socket.connect();
-
-
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -185,8 +185,6 @@ public class MainMenu extends AppCompatActivity
 
         navigationView = new NavigationView(this);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-
 
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -236,6 +234,7 @@ public class MainMenu extends AppCompatActivity
 
     /**
      * Inflates the toolbar menu
+     *
      * @param menu
      * @return bool Whether or not it was successful
      */
@@ -243,11 +242,10 @@ public class MainMenu extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // This will get deleted and changed with the text editor UI later on
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        TextView nameText = (TextView)navigationView.findViewById(R.id.nameView);
+        TextView nameText = (TextView) navigationView.findViewById(R.id.nameView);
         nameText.setText(clientName);
-        nameText = (TextView)navigationView.findViewById(R.id.emailView);
+        nameText = (TextView) navigationView.findViewById(R.id.emailView);
         nameText.setText(clientEmail);
-
 
 
         URL url = null;
@@ -285,13 +283,13 @@ public class MainMenu extends AppCompatActivity
         }
 
 
-
         return true;
     }
 
     /**
      * Callback functions for handling button presses to either upload or download
      * a note to the server.
+     *
      * @param item Button in question
      * @return
      */
@@ -299,7 +297,7 @@ public class MainMenu extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_menu:
-                NoteFragment noteFrag = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                NoteFragment noteFrag = (NoteFragment) fragManager.findFragmentByTag("notepad");
                 if (noteFrag != null) {
                     String title = noteFrag.title;
                     JSONObject json = new JSONObject();
@@ -320,7 +318,7 @@ public class MainMenu extends AppCompatActivity
                 break;
 
             case R.id.action_up:
-                final NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                final NoteFragment noteFragment = (NoteFragment) fragManager.findFragmentByTag("notepad");
 
                 if (noteFragment != null) {
                     final String[] noteTitle = new String[1];
@@ -364,9 +362,7 @@ public class MainMenu extends AppCompatActivity
                         });
                         builder.show();
 
-                    }
-
-                    else {
+                    } else {
                         EditText tempEditor = (EditText) findViewById(R.id.sharedText);
                         JSONObject jsonNew = new JSONObject();
                         try {
@@ -391,6 +387,7 @@ public class MainMenu extends AppCompatActivity
 
     /**
      * Another button callback handler, used for buttons in the navigation drawer.
+     *
      * @param item
      * @return
      */
@@ -408,8 +405,107 @@ public class MainMenu extends AppCompatActivity
             NoteFragment newNoteList = new NoteFragment();
             newNoteList.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, newNoteList, "notepad").commit();
-        }
-        else if (id == R.id.nav_navigate) {
+
+
+            final NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+
+            if (noteFragment != null) {
+                final String[] noteTitle = new String[1];
+
+                if (noteFragment.title.equals("default")) {
+                    Log.d("nodejs", "entering alerter");
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Please enter a title for your note");
+                    final EditText input = new EditText(this);
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(input);
+
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            noteTitle[0] = input.getText().toString();
+                            noteFragment.title = noteTitle[0];
+                            Log.d("nodejs", noteFragment.title);
+                            toolbar.setTitle(noteFragment.title);
+                            EditText tempEditor = (EditText) findViewById(R.id.sharedText);
+                            JSONObject jsonNew = new JSONObject();
+                            try {
+                                jsonNew.put("command", "push");
+                                jsonNew.put("target", noteFragment.title);
+                                jsonNew.put("data", tempEditor.getText());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            String sentNew = jsonNew.toString() + '\n';
+                            try {
+                                socket.send(sentNew);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
+
+                }
+            }
+
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+
+
+                    final EditText editor = (EditText) findViewById(R.id.sharedText);
+                    editor.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before,
+                                                  int count) {
+                            Log.d("nodejs", "text changed");
+
+                            JSONObject jsonNew = new JSONObject();
+                            try {
+                                jsonNew.put("command", "push");
+                                jsonNew.put("target", noteFragment.title);
+                                jsonNew.put("data", editor.getText());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            String sentNew = jsonNew.toString() + '\n';
+                            try {
+                                socket.send(sentNew);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+
+                        }
+
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count,
+                                                      int after) {
+                            // TODO Auto-generated method stub
+
+                        }
+                    });
+
+                }
+            }, 1000);
+
+
+        } else if (id == R.id.nav_navigate) {
             fragManager.beginTransaction()
                     .replace(R.id.content_frame
                             , new NoteListFragment(), "noteList")
@@ -429,7 +525,7 @@ public class MainMenu extends AppCompatActivity
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }  else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_share) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Please enter a Gmail address to share with.");
@@ -441,7 +537,7 @@ public class MainMenu extends AppCompatActivity
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     String newEmail = input.getText().toString();
-                    NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                    NoteFragment noteFragment = (NoteFragment) fragManager.findFragmentByTag("notepad");
                     JSONObject jsonNew = new JSONObject();
                     try {
                         jsonNew.put("command", "addUser");
@@ -472,3 +568,6 @@ public class MainMenu extends AppCompatActivity
         return true;
     }
 }
+
+
+

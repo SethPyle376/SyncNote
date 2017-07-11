@@ -3,12 +3,15 @@ package com.pyle.syncnote;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.zip.Inflater;
@@ -42,15 +46,17 @@ public class NetworkCallback implements Client.ClientCallback {
     String designatedNote;
     Toolbar mainToolbar;
     FloatingActionButton fab;
+    Client socket;
 
 
-    public NetworkCallback(Context context, FragmentManager fragMan, Toolbar mainToolbar, FloatingActionButton fab) {
+    public NetworkCallback(Context context, FragmentManager fragMan, Toolbar mainToolbar, FloatingActionButton fab, MainMenu mainMenu) {
         mainContext = context;
         mainActivity = (Activity) context;
         this.fragMan = fragMan;
         list = new ArrayList<String>();
         this.mainToolbar = mainToolbar;
         this.fab = fab;
+        this.socket = mainMenu.socket;
     }
 
     public String getDesignatedNote() {
@@ -89,6 +95,77 @@ public class NetworkCallback implements Client.ClientCallback {
                         fragMan.beginTransaction()
                                 .replace(R.id.content_frame, noteFrag, "notepad")
                                 .commit();
+
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+
+                                final NoteFragment noteFragment = (NoteFragment)fragMan.findFragmentByTag("notepad");
+                                final EditText editor = (EditText) mainActivity.findViewById(R.id.sharedText);
+                                editor.addTextChangedListener(new TextWatcher() {
+                                    @Override
+                                    public void onTextChanged(CharSequence s, int start, int before,
+                                                              int count) {
+                                        Log.d("nodejs", "text changed");
+
+                                        if (count == 1) {
+                                            JSONObject jsonNew = new JSONObject();
+
+                                            try {
+                                                jsonNew.put("command", "push");
+                                                jsonNew.put("target", noteFragment.title);
+                                                jsonNew.put("data", editor.getText());
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                            String sentNew = jsonNew.toString() + '\n';
+                                            try {
+                                                if (editor.hasFocus())
+                                                    socket.send(sentNew);
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+
+
+
+                                    }
+
+                                    @Override
+                                    public void afterTextChanged(Editable s) {
+
+                                    }
+
+                                    @Override
+                                    public void beforeTextChanged(CharSequence s, int start, int count,
+                                                                  int after) {
+                                        // TODO Auto-generated method stub
+
+                                    }
+                                });
+
+                                JSONObject jsonNew = new JSONObject();
+                                try {
+                                    jsonNew.put("command", "pull");
+                                    jsonNew.put("target", noteFragment.title);
+                                    String sentNew = jsonNew.toString() + '\n';
+                                    socket.send(sentNew);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                            }
+                        }, 1000);
+
+
+
+
+
+
                     }});
             }
         }
