@@ -67,6 +67,21 @@
             app:layout_anchorGravity="end" />
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_bold_on"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_marginLeft="95dp"
+            android:layout_marginStart="95dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_font_bold"
+            android:visibility="gone"
+            app:backgroundTint="@android:color/holo_orange_light"
+            app:fabSize="mini"
+            app:layout_anchor="@id/fab_italic"
+            app:layout_anchorGravity="end" />
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,6 +104,7 @@
                 android:ems="10"
                 android:gravity="top|left"
                 android:inputType="textMultiLine"
+                android:textColor="#ff0008"
                 tools:layout_editor_absoluteX="16dp"
                 tools:layout_editor_absoluteY="16dp" />
 
