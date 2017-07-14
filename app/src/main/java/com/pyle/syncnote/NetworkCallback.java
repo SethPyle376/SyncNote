@@ -66,8 +66,6 @@ public class NetworkCallback implements Client.ClientCallback {
     @Override
     public void onMessage(String message) throws JSONException {
         Log.d("NODEJS", message);
-        Snackbar snackBar = Snackbar.make(((Activity)mainContext).findViewById(R.id.myCoordinatorLayout), message, LENGTH_SHORT);
-        snackBar.show();
         JSONObject jsonObject = new JSONObject(message);
         String command = jsonObject.getString("command");
         Log.d("nodejs", command);

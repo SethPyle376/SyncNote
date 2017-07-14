@@ -286,104 +286,6 @@ public class MainMenu extends AppCompatActivity
         return true;
     }
 
-    /**
-     * Callback functions for handling button presses to either upload or download
-     * a note to the server.
-     *
-     * @param item Button in question
-     * @return
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_menu:
-                NoteFragment noteFrag = (NoteFragment) fragManager.findFragmentByTag("notepad");
-                if (noteFrag != null) {
-                    String title = noteFrag.title;
-                    JSONObject json = new JSONObject();
-                    try {
-                        json.put("command", "pull");
-                        json.put("target", title);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    String sent = json.toString() + '\n';
-                    try {
-                        Log.d("nodejs", sent);
-                        socket.send(sent);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-
-            case R.id.action_up:
-                final NoteFragment noteFragment = (NoteFragment) fragManager.findFragmentByTag("notepad");
-
-                if (noteFragment != null) {
-                    final String[] noteTitle = new String[1];
-
-                    if (noteFragment.title.equals("default")) {
-                        Log.d("nodejs", "entering alerter");
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("Please enter a title for your note");
-                        final EditText input = new EditText(this);
-                        input.setInputType(InputType.TYPE_CLASS_TEXT);
-                        builder.setView(input);
-
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                noteTitle[0] = input.getText().toString();
-                                noteFragment.title = noteTitle[0];
-                                toolbar.setTitle(noteFragment.title);
-                                EditText tempEditor = (EditText) findViewById(R.id.sharedText);
-                                JSONObject jsonNew = new JSONObject();
-                                try {
-                                    jsonNew.put("command", "push");
-                                    jsonNew.put("target", noteFragment.title);
-                                    jsonNew.put("data", tempEditor.getText());
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                String sentNew = jsonNew.toString() + '\n';
-                                try {
-                                    socket.send(sentNew);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        });
-                        builder.show();
-
-                    } else {
-                        EditText tempEditor = (EditText) findViewById(R.id.sharedText);
-                        JSONObject jsonNew = new JSONObject();
-                        try {
-                            jsonNew.put("command", "push");
-                            jsonNew.put("target", noteFragment.title);
-                            jsonNew.put("data", tempEditor.getText());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        String sentNew = jsonNew.toString() + '\n';
-                        try {
-                            socket.send(sentNew);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      * Another button callback handler, used for buttons in the navigation drawer.
@@ -407,12 +309,12 @@ public class MainMenu extends AppCompatActivity
             getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, newNoteList, "notepad").commit();
 
 
-            final NoteFragment noteFragment = (NoteFragment)fragManager.findFragmentByTag("notepad");
+            final NoteFragment[] noteFragment = {(NoteFragment) fragManager.findFragmentByTag("notepad")};
 
-            if (noteFragment != null) {
+            if (noteFragment[0] != null) {
                 final String[] noteTitle = new String[1];
 
-                if (noteFragment.title.equals("default")) {
+                if (noteFragment[0].title.equals("default")) {
                     Log.d("nodejs", "entering alerter");
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Please enter a title for your note");
@@ -424,14 +326,17 @@ public class MainMenu extends AppCompatActivity
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             noteTitle[0] = input.getText().toString();
-                            noteFragment.title = noteTitle[0];
-                            Log.d("nodejs", noteFragment.title);
-                            toolbar.setTitle(noteFragment.title);
+                            if (noteFragment[0] == null) {
+                                noteFragment[0] = (NoteFragment)fragManager.findFragmentByTag("notepad");
+                            }
+                            noteFragment[0].title = noteTitle[0];
+                            Log.d("nodejs", noteFragment[0].title);
+                            toolbar.setTitle(noteFragment[0].title);
                             EditText tempEditor = (EditText) findViewById(R.id.sharedText);
                             JSONObject jsonNew = new JSONObject();
                             try {
                                 jsonNew.put("command", "push");
-                                jsonNew.put("target", noteFragment.title);
+                                jsonNew.put("target", noteFragment[0].title);
                                 jsonNew.put("data", tempEditor.getText());
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -460,28 +365,32 @@ public class MainMenu extends AppCompatActivity
             handler.postDelayed(new Runnable() {
                 public void run() {
 
+                    final EditText[] editor = {(EditText) findViewById(R.id.sharedText)};
 
-                    final EditText editor = (EditText) findViewById(R.id.sharedText);
-                    editor.addTextChangedListener(new TextWatcher() {
+                    editor[0].addTextChangedListener(new TextWatcher() {
                         @Override
                         public void onTextChanged(CharSequence s, int start, int before,
                                                   int count) {
                             Log.d("nodejs", "text changed");
+                            if (count == 1) {
+                                JSONObject jsonNew = new JSONObject();
+                                try {
+                                    jsonNew.put("command", "push");
+                                    if (editor[0] == null) {
+                                        editor[0] = (EditText) findViewById(R.id.sharedText);
+                                    }
+                                    jsonNew.put("target", noteFragment[0].title);
+                                    jsonNew.put("data", editor[0].getText());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
 
-                            JSONObject jsonNew = new JSONObject();
-                            try {
-                                jsonNew.put("command", "push");
-                                jsonNew.put("target", noteFragment.title);
-                                jsonNew.put("data", editor.getText());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            String sentNew = jsonNew.toString() + '\n';
-                            try {
-                                socket.send(sentNew);
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                String sentNew = jsonNew.toString() + '\n';
+                                try {
+                                    socket.send(sentNew);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
 

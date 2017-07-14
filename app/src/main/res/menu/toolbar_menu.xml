@@ -2,17 +2,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/action_menu"
-        android:icon="@android:drawable/ic_menu_more"
-        android:gravity="left"
-        android:title="@string/action_menu"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_up"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="action_up"
-        app:showAsAction="ifRoom" />
-
 </menu>
