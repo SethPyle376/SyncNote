@@ -5,8 +5,24 @@
     android:id="@+id/fragment_container"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="1">
 
+
+    <EditText
+        android:id="@+id/sharedText"
+        android:layout_width="match_parent"
+        android:layout_height="228dp"
+        android:layout_marginLeft="16dp"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:gravity="top|left"
+        android:inputType="textMultiLine"
+        android:textColor="#000000"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp"
+        android:layout_weight="1.00" >
+    </EditText>
 
     <FrameLayout
         android:id="@+id/content_frame_toolbar"
@@ -33,6 +49,21 @@
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_bullet_point"
             app:backgroundTint="@android:color/background_light"
+            app:fabSize="mini"
+            app:layout_anchor="@id/fab_box"
+            app:layout_anchorGravity="top" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_bullet_on"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="95dp"
+            android:layout_marginRight="95dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_bullet_on"
+            android:visibility="gone"
+            app:backgroundTint="@android:color/background_dark"
             app:fabSize="mini"
             app:layout_anchor="@id/fab_box"
             app:layout_anchorGravity="top" />
@@ -79,17 +110,74 @@
             app:fabSize="mini"
             app:layout_anchor="@id/fab_box"
             app:layout_anchorGravity="top" />
+
     </FrameLayout>
 
-    <EditText
-                android:id="@+id/sharedText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:ems="10"
-                android:gravity="top|left"
-                android:inputType="textMultiLine"
-                tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="16dp" />
+    <FrameLayout
+        android:id="@+id/content_frame_toolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_color_black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/ic_fontcolor_black"
+            android:visibility="gone"
+            app:backgroundTint="@android:color/background_light"
+            app:fabSize="mini"
+            app:layout_anchor="@id/fab_box"
+            app:layout_anchorGravity="top" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_color_red"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_marginLeft="60dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/ic_fontcolor_black"
+            android:visibility="gone"
+            app:backgroundTint="@android:color/holo_red_dark"
+            app:fabSize="mini"
+            app:layout_anchor="@id/fab_box"
+            app:layout_anchorGravity="top" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_color_blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_marginLeft="104dp"
+            android:layout_marginStart="104dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/ic_fontcolor_black"
+            android:visibility="gone"
+            app:backgroundTint="@color/colorPrimaryDark"
+            app:fabSize="mini"
+            app:layout_anchor="@id/fab_box"
+            app:layout_anchorGravity="top" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_color_green"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_marginLeft="148dp"
+            android:layout_marginStart="148dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/ic_fontcolor_black"
+            android:visibility="gone"
+            app:backgroundTint="@android:color/holo_green_dark"
+            app:fabSize="mini"
+            app:layout_anchor="@id/fab_box"
+            app:layout_anchorGravity="top" />
+    </FrameLayout>
+
 
 </LinearLayout>
