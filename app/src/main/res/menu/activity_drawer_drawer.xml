@@ -16,11 +16,7 @@
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share (Not functional yet)" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_camera"
-                android:title="Send (Not functional yet)" />
+                android:title="Share" />
         </menu>
     </item>
 
