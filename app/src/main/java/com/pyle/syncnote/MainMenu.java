@@ -68,12 +68,7 @@ public class MainMenu extends AppCompatActivity
     private android.support.v4.app.FragmentManager fragManager;
     private Context myActivity;
     private FloatingActionButton fab;
-    private FloatingActionButton fab_color;
-    private FloatingActionButton fab_bold;
-    private FloatingActionButton fab_italic;
-    private FloatingActionButton fab_bullet;
-    private FloatingActionButton fab_box;
-    private FloatingActionButton fab_bold_on;
+
 
 
     Client socket;
@@ -155,48 +150,7 @@ public class MainMenu extends AppCompatActivity
                                    });
         }
 
-        fab_bold = (FloatingActionButton) findViewById(R.id.fab_bold);
-        fab_bold_on = (FloatingActionButton) findViewById(R.id.fab_bold_on);
-        if (fab_bold != null) {
-            fab_bold.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    EditText contentText = (EditText) findViewById(R.id.sharedText);
 
-                    int selectionStart = contentText.getSelectionStart();
-
-                    int styleStart = selectionStart;
-
-                    int selectionEnd = contentText.getSelectionEnd();
-
-                    if (selectionStart > selectionEnd) {
-                        int temp = selectionEnd;
-                        selectionEnd = selectionStart;
-                        selectionStart = temp;
-                    }
-
-                    if (selectionEnd > selectionStart) {
-                        Spannable str = contentText.getText();
-                        StyleSpan[] ss = str.getSpans(selectionStart, selectionEnd, StyleSpan.class);
-
-                        boolean exists = false;
-                        for (int i = 0; i < ss.length; i++) {
-                            if (ss[i].getStyle() == android.graphics.Typeface.BOLD) {
-                                str.removeSpan(ss[i]);
-                                exists = true;
-                            }
-                        }
-
-                        if (!exists) {
-                            str.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), selectionStart, selectionEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        }
-
-                        // Code to make this button invisible and show the fab_bold_on button
-                    }
-                }
-
-            });
-        }
 
         callback = new NetworkCallback(this, getSupportFragmentManager(), toolbar, fab);
         socket = new Client("52.10.127.103", 4000, this);
