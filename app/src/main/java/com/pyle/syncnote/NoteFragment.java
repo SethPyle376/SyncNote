@@ -1,11 +1,15 @@
 package com.pyle.syncnote;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -34,6 +38,7 @@ public class NoteFragment extends android.support.v4.app.Fragment {
     private FloatingActionButton color_green;
     private FloatingActionButton bullet_on;
     private EditText contentText;
+    private Context myActivity;
 
     @Nullable
     @Override
@@ -43,6 +48,7 @@ public class NoteFragment extends android.support.v4.app.Fragment {
         Bundle bundle = getArguments();
         title = bundle.getString("title");
         myView = inflater.inflate(R.layout.notefragment, container, false);
+        myActivity = getActivity();
 
         // This allows us the user to change the selected text to bold
         bold = (FloatingActionButton)  myView.findViewById(R.id.fab_bold);
@@ -78,6 +84,8 @@ public class NoteFragment extends android.support.v4.app.Fragment {
                             str.setSpan(new StyleSpan(Typeface.BOLD), selectionStart, selectionEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
                     }
+
+                    checkSelection(selectionEnd, selectionStart);
                 }
 
             });
@@ -117,6 +125,8 @@ public class NoteFragment extends android.support.v4.app.Fragment {
                             str.setSpan(new StyleSpan(Typeface.ITALIC), selectionStart, selectionEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
                     }
+
+                    checkSelection(selectionEnd, selectionStart);
                 }
 
             });
@@ -166,6 +176,8 @@ public class NoteFragment extends android.support.v4.app.Fragment {
                     color_blue.setVisibility(view.GONE);
                     color_red.setVisibility(view.GONE);
                     color_green.setVisibility(view.GONE);
+
+                    checkSelection(selectionEnd, selectionStart);
                 }
 
             });
@@ -197,6 +209,8 @@ public class NoteFragment extends android.support.v4.app.Fragment {
                     color_blue.setVisibility(view.GONE);
                     color_red.setVisibility(view.GONE);
                     color_green.setVisibility(view.GONE);
+
+                    checkSelection(selectionEnd, selectionStart);
                 }
 
             });
@@ -228,6 +242,8 @@ public class NoteFragment extends android.support.v4.app.Fragment {
                     color_blue.setVisibility(view.GONE);
                     color_red.setVisibility(view.GONE);
                     color_green.setVisibility(view.GONE);
+
+                    checkSelection(selectionEnd, selectionStart);
                 }
 
             });
@@ -259,11 +275,37 @@ public class NoteFragment extends android.support.v4.app.Fragment {
                     color_blue.setVisibility(view.GONE);
                     color_red.setVisibility(view.GONE);
                     color_green.setVisibility(view.GONE);
+
+                    checkSelection(selectionEnd, selectionStart);
                 }
 
             });
         }
 
         return myView;
+    }
+
+    /*
+     * Check to make sure that something is selected, if not, displays instructions to the user
+     */
+    private void checkSelection (int selectionEnd, int selectionStart) {
+
+        if(myActivity != null){
+            if (selectionEnd == selectionStart) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(myActivity);
+                builder.setTitle("Text must be selected to apply changes");
+                final EditText input = new EditText(myActivity);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+
+                builder.setNegativeButton("Got It!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        }
     }
 }

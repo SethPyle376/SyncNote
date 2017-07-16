@@ -29,12 +29,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- The next three buttons are hidden since they do not work yet-->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
             android:layout_margin="@dimen/fab_margin"
+            android:visibility="invisible"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
             app:srcCompat="@drawable/ic_check_box" />
@@ -48,6 +50,7 @@
             android:layout_marginRight="95dp"
             android:layout_marginTop="16dp"
             android:src="@drawable/ic_bullet_point"
+            android:visibility="invisible"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini"
             app:layout_anchor="@id/fab_box"
