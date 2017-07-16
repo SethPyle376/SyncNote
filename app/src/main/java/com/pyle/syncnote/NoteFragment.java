@@ -294,9 +294,6 @@ public class NoteFragment extends android.support.v4.app.Fragment {
             if (selectionEnd == selectionStart) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(myActivity);
                 builder.setTitle("Text must be selected to apply changes");
-                final EditText input = new EditText(myActivity);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
 
                 builder.setNegativeButton("Got It!", new DialogInterface.OnClickListener() {
                     @Override

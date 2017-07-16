@@ -4,11 +4,11 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_new"
-            android:src="@drawable/ic_create_note"
+            android:icon="@drawable/ic_create_note"
             android:title="New Note" />
         <item
             android:id="@+id/nav_navigate"
-            android:src="@drawable/ic_open_notes"
+            android:icon="@drawable/ic_open_notes"
             android:title="Note List" />
     </group>
     <item android:title="Communicate">
@@ -22,4 +22,3 @@
 
 </menu>
 
-<!--Used to have android:icon= instead of android:src= -->
